@@ -1,4 +1,4 @@
-var http = require('https'),
+var http = require('http'),
 socketIO = require('socket.io'),
 
 // port = 8888,
