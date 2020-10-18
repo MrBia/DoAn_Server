@@ -1,3 +1,5 @@
+const { clearScreenDown } = require('readline');
+
 var http = require('http'),
 socketIO = require('socket.io'),
 
@@ -21,7 +23,7 @@ server = http.createServer(function (req, res) {
     res.end();
 }).listen(port),
 
-io = socketIO.listen(server);
+io = socketIO(server);
 io.set('match origin protocol', true);
 io.set('origins', '*:*');
 
