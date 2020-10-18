@@ -3,7 +3,7 @@ socketIO = require('socket.io'),
 
 // port = 8888,
 // ip = '127.0.0.1',
-port = process.env.PORT || 8888,
+port = 8888,
 // ip = '192.168.1.10',
 userID = 0,
 
