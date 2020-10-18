@@ -21,6 +21,7 @@ server = http.createServer(function (req, res) {
     res.end();
 }).listen(port, '0.0.0.0'),
 
+
 io = socketIO(server);
 io.set('match origin protocol', true);
 io.set('origins', '*:*');
