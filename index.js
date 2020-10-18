@@ -4,7 +4,7 @@ socketIO = require('socket.io'),
 // port = 8888,
 // ip = '127.0.0.1',
 port = process.env.PORT || 8888,
-// ip = '192.168.1.10',
+ip = process.env.IP ||'192.168.1.10',
 userID = 0,
 
 // STATE
@@ -16,12 +16,11 @@ down = "down",
 
 listClient = [],
 
-server = http.createServer(function (req, res) {
-    res.write('Hello World!' + port); //write a response to the client
-    res.end();
-}).listen(port),
+server = http.createServer().listen(port, ip, function(){
+    console.log('Socket.IO server started at %s:%s!', ip, port);
+}),
 
-io = socketIO(server);
+io = socketIO.listen(server);
 io.set('match origin protocol', true);
 io.set('origins', '*:*');
 
@@ -40,7 +39,7 @@ var run = function(socket){
 
     // INIT ONE CHARACTOR IN DEVICE
     socket.on('init_request', function(position){
-        console.log('Received: ' + position);
+        // console.log('Received: ' + position);
         // after receiving the initialization request, accept the initiation
 
         listClient[listClient.length-1].posX = position.split("/",2)[0];//console.log("here " + listClient[listClient.length-1].posX);
@@ -51,7 +50,7 @@ var run = function(socket){
             for(var j = 0; j < listClient.length; j++){
                 // SEND POSITION INIT AND USERID TO PLAYER(DEVICE)
                 listClient[i].emit('accept_init', {pos: listClient[j].pos, id: listClient[j].userID});
-                console.log("four time");
+                //console.log("four time");
             }
         }
 
@@ -64,7 +63,7 @@ var run = function(socket){
         var state = stateAndID.split("/", 2)[0];
         // var id = stateAndID.split("/", 2)[1];
         
-        console.log(state+"  " + socket.userID);
+        // console.log(state+"  " + socket.userID);
 
         var id = socket.userID;
 
