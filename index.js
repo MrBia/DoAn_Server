@@ -19,7 +19,7 @@ listClient = [],
 server = http.createServer(function (req, res) {
     res.write('Hello World!' + port); //write a response to the client
     res.end();
-}).listen(port),
+}).listen(port, '0.0.0.0'),
 
 io = socketIO(server);
 io.set('match origin protocol', true);
