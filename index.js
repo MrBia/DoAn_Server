@@ -4,7 +4,7 @@ socketIO = require('socket.io'),
 // port = 8888,
 // ip = '127.0.0.1',
 port = process.env.PORT || 8888,
-ip = '192.168.1.10',
+// ip = '192.168.1.10',
 userID = 0,
 
 // STATE
@@ -16,9 +16,7 @@ down = "down",
 
 listClient = [],
 
-server = http.createServer().listen(port, ip, function(){
-    console.log('Socket.IO server started at %s:%s!', ip, port);
-}),
+server = http.createServer().listen(port),
 
 io = socketIO.listen(server);
 io.set('match origin protocol', true);

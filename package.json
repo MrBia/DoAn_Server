@@ -1,0 +1,27 @@
+{
+  "name": "folder",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js","engines": {
+    "node": "10.x"
+  },
+  "dependencies": {
+    "socket.io": "^2.3.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MrBia/DoAn_Server.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MrBia/DoAn_Server/issues"
+  },
+  "homepage": "https://github.com/MrBia/DoAn_Server#readme"
+}
