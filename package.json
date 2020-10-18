@@ -2,10 +2,12 @@
   "name": "folder",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js","engines": {
+  "main": "index.js",
+  "engines": {
     "node": "10.x"
   },
   "dependencies": {
+    "express": "^4.17.1",
     "socket.io": "^2.3.0"
   },
   "devDependencies": {},
