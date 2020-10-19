@@ -17,7 +17,7 @@ down = "down",
 listClient = [],
 
 server = http.createServer(function (req, res) {
-    res.write('Hello World!!!!' + port); //write a response to the client
+    res.write('Hello World!!' + port); //write a response to the client
     res.end();
 }).listen(port, '0.0.0.0'),
 
