@@ -42,7 +42,7 @@ var run = function(socket){
 
     // INIT ONE CHARACTOR IN DEVICE
     socket.on('init_request', function(position){
-        console.log('Received: ' + position);
+        // console.log('Received: ' + position);
         // after receiving the initialization request, accept the initiation
 
         listClient[listClient.length-1].posX = position.split("/",2)[0];//console.log("here " + listClient[listClient.length-1].posX);
@@ -53,7 +53,7 @@ var run = function(socket){
             for(var j = 0; j < listClient.length; j++){
                 // SEND POSITION INIT AND USERID TO PLAYER(DEVICE)
                 listClient[i].emit('accept_init', {pos: listClient[j].pos, id: listClient[j].userID});
-                console.log("four time");
+                // console.log("four time");
             }
         }
 
@@ -66,7 +66,7 @@ var run = function(socket){
         var state = stateAndID.split("/", 2)[0];
         // var id = stateAndID.split("/", 2)[1];
         
-        console.log(state+"  " + socket.userID);
+        // console.log(state+"  " + socket.userID);
 
         var id = socket.userID;
 
