@@ -42,7 +42,7 @@ var run = function(socket){
 
     // INIT ONE CHARACTOR IN DEVICE
     socket.on('init_request', function(position){
-        // console.log('Received: ' + position);
+        console.log('Received: ' + position);
         // after receiving the initialization request, accept the initiation
 
         listClient[listClient.length-1].posX = position.split("/",2)[0];//console.log("here " + listClient[listClient.length-1].posX);
@@ -53,7 +53,7 @@ var run = function(socket){
             for(var j = 0; j < listClient.length; j++){
                 // SEND POSITION INIT AND USERID TO PLAYER(DEVICE)
                 listClient[i].emit('accept_init', {pos: listClient[j].pos, id: listClient[j].userID});
-                // console.log("four time");
+                console.log("four time");
             }
         }
 
@@ -66,7 +66,7 @@ var run = function(socket){
         var state = stateAndID.split("/", 2)[0];
         // var id = stateAndID.split("/", 2)[1];
         
-        // console.log(state+"  " + socket.userID);
+        console.log("hahaha "+state+"  " + socket.userID);
 
         var id = socket.userID;
 
@@ -76,20 +76,22 @@ var run = function(socket){
             ///////////////
         }
         else if(state == left){
-            //console.log("left");
+            console.log("left");
             listClient[id].posX = Number(listClient[id].posX);
             listClient[id].posX-=5;
         }
         else if(state == right){
-            // console.log("right");
+            console.log("right");
             listClient[id].posX = Number(listClient[id].posX);
             listClient[id].posX+=5;
         }
         else if(state == up){
+            console.log("up");
             listClient[id].posY = Number(listClient[id].posY);
             listClient[id].posY+=5;
         }
         else if(state == down){
+            console.log("right");
             listClient[id].posY = Number(listClient[id].posY);
             listClient[id].posY-=5;
         }
