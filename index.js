@@ -17,7 +17,7 @@ down = "down",
 // POSITION OF OBJECT (DIAMOND, GRASS, ROCK)
 arrDiamondPos = [[6,5], [7,5], [8,5], [9,5], [10,5], [11, 5], [12,5],[13,5], [14,5]],
 arrGrassPos = [[6,4], [7,4], [8,4], [9,4], [10,4], [11, 4], [12,4],[13,4], [14,4]],
-arrRockPos = [],
+arrRockPos = [[7,6],[8,6],[9,6],[10,6],[11,6],[12,6],[13,6]],
 arrPlayerPos = [[2, 3], [3, 3]],
 
 // ARRAY OBJECT (DIAMOND, GRASS, ROCK, PLAYER)
@@ -130,6 +130,11 @@ var run = function(socket){
             }
         }
     });
+
+    socket.on('camera_client', function(data){
+        // console.log(socket.userID);
+        listClient[socket.userID].emit('camera_server', socket.userID);
+    });
 }
 
 var initDiamonds = function(){
@@ -166,5 +171,21 @@ var initDiamonds = function(){
     // }
 }
 
+var setCamera = function(x, y, winSizeWidth, winSizeHeight, mapWidth, mapHeight){
+    x = Math.max(x, winSizeWidth/2);
+    y = Math.max(y, winSizeHeight/2);
+
+    x = Math.min(x, mapWidth - winSizeWidth/2);
+    y = Math.min(y, mapHeight- winSizeHeight/2);
+
+    var actualPositionX = x;
+    var actualPositionY = y;
+    
+    var centerOfViewX = winSizeWidth/2;
+    var centerOfViewY = winSizeHeight/2;
+
+    var viewPointX = centerOfViewX-actualPositionX;
+    var viewPointY = centerOfViewY-actialPositionY;
+}
 
 io.sockets.on('connection', run);
