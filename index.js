@@ -20,6 +20,14 @@ arrGrassPos = [[6,4], [7,4], [8,4], [9,4], [10,4], [11, 4], [12,4],[13,4], [14,4
 arrRockPos = [[7,6],[8,6],[9,6],[10,6],[11,6],[12,6],[13,6]],
 arrPlayerPos = [[2, 3], [3, 3]],
 
+// POSITION OF MAP COLLISTION    x 0->47
+arrMapCollistion = [
+[2,3,4], [2,4], [2,4], [2,4], [2,4], [2,4,5], [1,6], [1,7], [1,7], [1,7],
+[1,7], [1,7], [1,7], [1,7], [1,6], [1,4,5], [1,4], [1,5], [1,5], [1,5],
+[1,5], [1,5], [1,4], [1, 4,5,6,7], [1,8,10,12,17,18], [1,9,10,12,16,19], [1,10,12,15,20], [2,3,4,5,10,12,14,21], [6,10,12,13,21], [6,10,18,21],
+[6,10, 12, 13, 21], [6,10,12,14,21], [6,10,12,13,14,15,20], [7,10,15,16,19], [7,10,12,13,15,17,18], [6,12,13,15], [7,9,10,12,13,15], [7,9,10,12,13,15,16,20], [8,10,12,17,18,19,21], [10,12,21],
+[10, 12,15,21], [9,12,21], [9,12,17,21], [9,14,21], [9,21], [10,12,18,19,20], [11,14,15,16,17],[12,13]],
+
 // ARRAY OBJECT (DIAMOND, GRASS, ROCK, PLAYER)
 diamonds = [],
 grasses = [],
@@ -70,6 +78,7 @@ var run = function(socket){
                 // SEND POSITION INIT AND USERID TO PLAYER(DEVICE)
                 listClient[i].emit('accept_init', {pos: listClient[j].pos, id: listClient[j].userID});
                 
+                
                 // OBJECT (DIAMOND, GRASS, ROCK)
                 listClient[i].emit('init_diamonds', diamonds);
                 listClient[i].emit('init_grasses', grasses);
@@ -79,7 +88,6 @@ var run = function(socket){
                 // console.log("four time");
             }
         }
-        
 
 
         // ADD USERID FOR NEW PLAYER
@@ -99,26 +107,75 @@ var run = function(socket){
         
         if(state == idle){
             ///////////////
+            var x = Math.floor(listClient[id].posX/64);
+            var y = Math.floor(listClient[id].posY/64);
+
+            listClient[id].posX = x*64+32;
+            listClient[id].posY = y*64;
         }
         else if(state == left){
             // console.log("left");
             listClient[id].posX = Number(listClient[id].posX);
-            listClient[id].posX-=5;
+
+            var x = Math.floor(listClient[id].posX/64);
+            var y = Math.floor(listClient[id].posY/64);
+            // console.log("left " + x +" " + y);
+            var check = 1;
+
+            for(var i = 0; i < arrMapCollistion[x-1].length; i++){
+                if(arrMapCollistion[x-1][i] == y) check = 0;
+            }
+
+            if(check == 1) listClient[id].posX-=5;
+            else listClient[id].posX = x*64 + 32;
         }
         else if(state == right){
             // console.log("right");
             listClient[id].posX = Number(listClient[id].posX);
-            listClient[id].posX+=5;
+
+            var x = Math.floor(listClient[id].posX/64);
+            var y = Math.floor(listClient[id].posY/64);
+            // console.log("right " + x +" " + y);
+            var check = 1;
+
+            for(var i = 0; i < arrMapCollistion[x+1].length; i++){
+                if(arrMapCollistion[x+1][i] == y) check = 0;
+            }
+
+            if(check == 1) listClient[id].posX+=5;
+            else listClient[id].posX = x*64 + 32;
         }
         else if(state == up){
             // console.log("up");
             listClient[id].posY = Number(listClient[id].posY);
-            listClient[id].posY+=5;
+
+            var x = Math.floor(listClient[id].posX/64);
+            var y = Math.floor(listClient[id].posY/64);
+            // console.log("up " + x +" " + y);
+            var check = 1;
+
+            for(var i = 0; i < arrMapCollistion[x].length; i++){
+                if(arrMapCollistion[x][i] == y+1) check = 0;
+            }
+
+
+            if(check == 1) listClient[id].posY+=5;
         }
         else if(state == down){
             // console.log("right");
             listClient[id].posY = Number(listClient[id].posY);
-            listClient[id].posY-=5;
+
+            var x = Math.floor(listClient[id].posX/64);
+            var y = Math.floor(listClient[id].posY/64);
+            // console.log("down " + x +" " + y);
+            var check = 1;
+
+            for(var i = 0; i < arrMapCollistion[x].length; i++){
+                if(arrMapCollistion[x][i] == y-1) check = 0;
+            }
+
+            if(check == 1) listClient[id].posY-=5;
+            else listClient[id].posY = y*64 +1;
         }
             
         
@@ -169,23 +226,6 @@ var initDiamonds = function(){
     // for(var i = 0; i < diamonds.length; i++){
     //     console.log("afaf " + diamonds[i].x);
     // }
-}
-
-var setCamera = function(x, y, winSizeWidth, winSizeHeight, mapWidth, mapHeight){
-    x = Math.max(x, winSizeWidth/2);
-    y = Math.max(y, winSizeHeight/2);
-
-    x = Math.min(x, mapWidth - winSizeWidth/2);
-    y = Math.min(y, mapHeight- winSizeHeight/2);
-
-    var actualPositionX = x;
-    var actualPositionY = y;
-    
-    var centerOfViewX = winSizeWidth/2;
-    var centerOfViewY = winSizeHeight/2;
-
-    var viewPointX = centerOfViewX-actualPositionX;
-    var viewPointY = centerOfViewY-actialPositionY;
 }
 
 io.sockets.on('connection', run);
