@@ -7,12 +7,23 @@ port = process.env.PORT || 8888,
 // ip = '192.168.1.10',
 userID = 0,
 
+// MAP
+xMap = 48,
+yMap = 23,
+
 // STATE
 idle = "idle",
 left = "left",
 right = "right",
 up = "up",
 down = "down",
+
+// VALUE OBJECT
+NONE = 0,
+DIAMOND = 1,
+ROCK = 2,
+GRASS = 3,
+COLLISION_MAP = 4,
 
 // POSITION OF OBJECT (DIAMOND, GRASS, ROCK)
 arrDiamondPos = [[6,5], [7,5], [8,5], [9,5], [10,5], [11, 5], [12,5],[13,5], [14,5]],
@@ -34,6 +45,8 @@ grasses = [],
 rocks = [],
 listClient = [],
 
+// ARRAY ALL OBJECT
+arrAllObjects = new Array(xMap),
 
 server = http.createServer(function (req, res) {
     res.write('Hello World!' + port); //write a response to the client
@@ -49,11 +62,30 @@ var run = function(socket){
     // console.log("oke " + arrDiamondPos[0][0]);
     console.log('connect....');
 
-    // INIT OBJECT (DIAMONDS, ROCK, GRASS)
-    if(diamonds.length == 0){
-        initDiamonds();
+    if(listClient.length == 0){                 // one time init
+        for(var i = 0; i < xMap; i++){
+            arrAllObjects[i] = new Array(yMap);
+        }
     }
     
+
+    //  INIT ARRAY OBJECT FOR SAVE POSITION   
+    if(listClient.length == 0){                 // one time init
+        for(var i = 0; i < xMap; i++){
+            for(var j = 0; j < yMap; j++){
+                arrAllObjects[i][j] = NONE;
+            }
+        }
+    }
+
+
+    // INIT OBJECT (DIAMONDS, ROCK, GRASS)      
+    if(listClient.length == 0){                 // one time init
+        initObjects();
+    }
+    
+
+
     // ASSIGNED AN ID FOR PLAYER
     socket.userID = userID;
 
@@ -78,7 +110,7 @@ var run = function(socket){
                 // SEND POSITION INIT AND USERID TO PLAYER(DEVICE)
                 listClient[i].emit('accept_init', {pos: listClient[j].pos, id: listClient[j].userID});
                 
-                
+
                 // OBJECT (DIAMOND, GRASS, ROCK)
                 listClient[i].emit('init_diamonds', diamonds);
                 listClient[i].emit('init_grasses', grasses);
@@ -100,7 +132,7 @@ var run = function(socket){
         // var id = stateAndID.split("/", 2)[1];
         
         // console.log("hahaha "+state+"  " + socket.userID);
-
+        test();
         var id = socket.userID;
 
         listClient[id].state = state;
@@ -122,8 +154,10 @@ var run = function(socket){
             // console.log("left " + x +" " + y);
             var check = 1;
 
-            for(var i = 0; i < arrMapCollistion[x-1].length; i++){
-                if(arrMapCollistion[x-1][i] == y) check = 0;
+
+            // HANDLE COLLISION
+            if(arrAllObjects[x-1][y] == COLLISION_MAP || arrAllObjects[x-1][y] == ROCK){
+                check = 0;
             }
 
             if(check == 1) listClient[id].posX-=5;
@@ -138,8 +172,9 @@ var run = function(socket){
             // console.log("right " + x +" " + y);
             var check = 1;
 
-            for(var i = 0; i < arrMapCollistion[x+1].length; i++){
-                if(arrMapCollistion[x+1][i] == y) check = 0;
+            // HANDLE COLLISION
+            if(arrAllObjects[x+1][y] == COLLISION_MAP || arrAllObjects[x+1][y] == ROCK){
+                check = 0;
             }
 
             if(check == 1) listClient[id].posX+=5;
@@ -154,8 +189,10 @@ var run = function(socket){
             // console.log("up " + x +" " + y);
             var check = 1;
 
-            for(var i = 0; i < arrMapCollistion[x].length; i++){
-                if(arrMapCollistion[x][i] == y+1) check = 0;
+            
+            // HANDLE COLLISION
+            if(arrAllObjects[x][y+1] == COLLISION_MAP || arrAllObjects[x][y+1] == ROCK){
+                check = 0;
             }
 
 
@@ -170,21 +207,47 @@ var run = function(socket){
             // console.log("down " + x +" " + y);
             var check = 1;
 
-            for(var i = 0; i < arrMapCollistion[x].length; i++){
-                if(arrMapCollistion[x][i] == y-1) check = 0;
+            
+            // HANDLE COLLISION
+            if(arrAllObjects[x][y-1] == COLLISION_MAP || arrAllObjects[x][y-1] == ROCK){
+                check = 0;
             }
 
             if(check == 1) listClient[id].posY-=5;
             else listClient[id].posY = y*64 +1;
         }
             
-        
+
         for(var i = 0; i < listClient.length; i++){
             // listClient[i].emit('stateFromServer', (state+"/"+listClient[i].userID));
             for(var j = 0; j < listClient.length; j++){
                 listClient[i].emit('stateFromServer', (listClient[j].state+"/"+listClient[j].userID));
                 listClient[i].emit('update_pos', {pos:(Math.floor(listClient[j].posX)+"/"+Math.floor(listClient[j].posY)), id:listClient[j].userID});
             }
+        }
+
+    });
+
+    socket.on('update_object_client', function(update){
+        // UPDATE DIAMOND POS
+        for(var i = 0; i < diamonds.length; i++){
+            var diamonX = Math.floor(diamonds[i].x/64);
+            var diamonY = Math.floor(diamonds[i].y/64);
+
+            if(arrAllObjects[diamonX][diamonY-1] == NONE){
+                diamonds[i].y+=1;
+            }
+            
+        }
+
+        for(var i = 0; i < grasses.length; i++){
+            var grassX = Math.floor(grasses[i].x/64);
+            var grassY = Math.floor(grasses[i].y/64);
+
+            if(arrAllObjects[grassX][grassY-1] == NONE){
+                grasses[i].y+=1;
+            }
+            
         }
     });
 
@@ -194,33 +257,83 @@ var run = function(socket){
     });
 }
 
-var initDiamonds = function(){
+var test = function(){
+    // for(var i = 0; i < diamonds.length; i++){
+    //     var diamonX = Math.floor(diamonds[i].x/64);
+    //     var diamonY = Math.floor(diamonds[i].y/64);
+
+    //     if(arrAllObjects[diamonX][diamonY-1] == NONE){
+    //         diamonds[i].y+=1;
+    //     }
+        
+    // }
+
+    for(var i = 0; i < grasses.length; i++){
+        var grassX = Math.floor(grasses[i].x);
+        var grassY = Math.floor(grasses[i].y);
+
+        if(arrAllObjects[grassX][grassY-1] == NONE){
+            grasses[i].y-=1;
+        }
+        
+    }
+}
+
+var initObjects = function(){
     for(var i = 0; i < arrDiamondPos.length; i++){
         var diamond = {x:0, y:0, alive:true};
-        diamond.x = arrDiamondPos[i][0];
-        diamond.y = arrDiamondPos[i][1];
+
+        var x = arrDiamondPos[i][0];
+        var y = arrDiamondPos[i][1];
+
+        diamond.x = x;
+        diamond.y = y;
         diamond.alive = true;
 
         diamonds.push(diamond);
+
+        arrAllObjects[x][y] = DIAMOND;
     }
 
     for(var i = 0; i < arrGrassPos.length; i++){
         var grass = {x:0, y:0, alive:true};
-        grass.x = arrGrassPos[i][0];
-        grass.y = arrGrassPos[i][1];
+
+        var x = arrGrassPos[i][0];
+        var y = arrGrassPos[i][1];
+
+        grass.x = x;
+        grass.y = y;
         grass.alive = true;
 
         grasses.push(grass);
+
+        arrAllObjects[x][y] = GRASS;
     }
 
     for(var i = 0; i < arrRockPos.length; i++){
         var rock = {x:0, y:0, alive:true};
-        rock.x = arrRockPos[i][0];
-        rock.y = arrRockPos[i][1];
+
+        var x = arrRockPos[i][0];
+        var y = arrRockPos[i][1];
+
+        rock.x = x;
+        rock.y = y;
         rock.alive = true;
 
         rocks.push(rock);
+
+        arrAllObjects[x][y] = ROCK;
     }
+
+    
+    // C0LLISION MAP
+    for(var i = 0; i < arrMapCollistion.length; i++){
+        for(var j = 0; j < arrMapCollistion[i].length; j++){
+            var index = arrMapCollistion[i][j];
+            arrAllObjects[i][index] = COLLISION_MAP;
+        }
+    }
+
 
     // // log to test
     // for(var i = 0; i < diamonds.length; i++){
